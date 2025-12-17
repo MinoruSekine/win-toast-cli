@@ -1,5 +1,6 @@
 param (
-    [parameter(mandatory=$true)][string]$body
+    [parameter(mandatory=$true)][string]$body,
+    [parameter(mandatory=$false)][string]$title
 )
 
 function Show-Toast {
