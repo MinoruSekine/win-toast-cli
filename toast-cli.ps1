@@ -33,4 +33,4 @@ function Show-Toast {
     [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($app_id).Show($toast)
 }
 
-Show-Toast "Title" -message $body
+Show-Toast -title $title -message $body
