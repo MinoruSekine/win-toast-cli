@@ -1,11 +1,12 @@
 param (
-    [parameter(mandatory=$true)][string]$body
+    [parameter(mandatory=$true)][string]$body,
+    [parameter(mandatory=$false)][string]$title
 )
 
 function Show-Toast {
     param (
-        [parameter(mandatory=$true)][string]$title,
-        [parameter(mandatory=$true)][string]$message,
+        [parameter(mandatory=$false)][string]$title,
+        [parameter(mandatory=$false)][string]$message,
         [parameter(mandatory=$false)][string]$detail
     )
 
@@ -32,4 +33,4 @@ function Show-Toast {
     [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($app_id).Show($toast)
 }
 
-Show-Toast "Title" $body
+Show-Toast "Title" -message $body
