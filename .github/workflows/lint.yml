@@ -12,16 +12,39 @@ jobs:
   PSScriptAnalyzer:
     runs-on: windows-latest
 
+    permissions:
+      pull-requests: write
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
+
+      - name: Setup Reviewdog
+        uses: reviewdog/action-setup@v1.5.0
 
       - name: Run PSScriptAnalyzer
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
           path: .\
           recurse: true
-          output: results.sarif
+          output: PSScriptAnalyzer.sarif
+
+      - name: Convert SARIF URIs to relative
+        shell: pwsh
+        run: |
+          $cwd = (Get-Location).Path
+          $rootUri = (New-Object System.Uri($cwd)).AbsoluteUri.TrimEnd('/')
+          (Get-Content PSScriptAnalyzer.sarif -Raw) `
+            -replace [regex]::Escape("$rootUri/"), '' `
+            | Set-Content PSScriptAnalyzer.rel.sarif
+
+      - name: Review by PSScriptAnalyzer outputs
+        shell: pwsh
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
+        run: |
+          Get-Content PSScriptAnalyzer.rel.sarif |
+            reviewdog -f=sarif -reporter=github-pr-review
 
   YAMLLint:
     runs-on: ubuntu-latest
