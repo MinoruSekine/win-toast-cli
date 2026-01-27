@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Reviewdog
         uses: reviewdog/action-setup@v1.5.0
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: YAMLLint
         uses: karancode/yamllint-github-action@v2.1.1
@@ -62,6 +62,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: DavidAnson/markdownlint-cli2-action@v20
+
+  Blinter-simple-output:
+    name: Lint batchfiles.
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7.2.0
+
+      - run: uv venv
+
+      - run: |
+          uv pip install \
+          git+https://github.com/MinoruSekine/Blinter-simple-output.git@d685af5
+
+      - run: |
+          uv run blinter-simple-output --style github-annotation toast-cli.cmd
