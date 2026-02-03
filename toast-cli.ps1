@@ -17,16 +17,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 param (
-    [parameter(mandatory=$true)][string]$body,
-    [parameter(mandatory=$false)][string]$title,
-    [parameter(mandatory=$false)][string]$detail
+    [Parameter(Mandatory = $true)][string]$body,
+    [Parameter(Mandatory = $false)][string]$title,
+    [Parameter(Mandatory = $false)][string]$detail
 )
 
 function Show-Toast {
     param (
-        [parameter(mandatory=$false)][string]$title,
-        [parameter(mandatory=$false)][string]$message,
-        [parameter(mandatory=$false)][string]$detail
+        [Parameter(Mandatory = $false)][string]$title,
+        [Parameter(Mandatory = $false)][string]$message,
+        [Parameter(Mandatory = $false)][string]$detail
     )
 
     [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
