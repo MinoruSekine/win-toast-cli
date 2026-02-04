@@ -16,17 +16,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+[CmdletBinding()]
 param (
-    [parameter(mandatory=$true)][string]$body,
-    [parameter(mandatory=$false)][string]$title,
-    [parameter(mandatory=$false)][string]$detail
+    [string]$body,
+    [string]$title,
+    [string]$detail,
+    [switch]$version
 )
+
+$ToastCliVersion = '0.0.1'
 
 function Show-Toast {
     param (
-        [parameter(mandatory=$false)][string]$title,
-        [parameter(mandatory=$false)][string]$message,
-        [parameter(mandatory=$false)][string]$detail
+        [Parameter(Mandatory = $false)][string]$title,
+        [Parameter(Mandatory = $false)][string]$message,
+        [Parameter(Mandatory = $false)][string]$detail
     )
 
     [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
@@ -52,4 +56,15 @@ function Show-Toast {
     [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($app_id).Show($toast)
 }
 
-Show-Toast -title $title -message $body -detail $detail
+if ($version) {
+    Write-Output "$($MyInvocation.MyCommand.Name) $ToastCliVersion"
+} else {
+    if ($body) {
+        Show-Toast -title $title -message $body -detail $detail
+    } else {
+        Write-Error "Missing required argument: -Body. See -? for usage."
+        exit 1
+    }
+}
+
+exit 0
