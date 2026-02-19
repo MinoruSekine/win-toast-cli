@@ -2,6 +2,18 @@
 
 Invoke toast notification by command-line.
 
+## How to install
+
+### [Scoop](https://scoop.sh)
+
+`win-toast-cli` is available in non-"known bucket"
+[MinoruSekine/scoop-bucket-MinoruSekine](https://github.com/MinoruSekine/scoop-bucket-MinoruSekine).
+
+```powershell
+> scoop bucket add MinoruSekine https://github.com/MinoruSekine/scoop-bucket-MinoruSekine
+> scoop install MinoruSekine/win-toast-cli
+```
+
 ## Usage
 
 On PowerShell console,
