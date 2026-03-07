@@ -21,7 +21,14 @@ setlocal
 
 set "ps_script_name=toast-cli.ps1"
 
-powershell %~dp0%ps_script_name% %*
+where pwsh >nul 2>&1
+if %errorlevel%==0 (
+    set powershell_exe=pwsh
+) else (
+    set powershell_exe=powershell
+)
+
+%powershell_exe% %~dp0%ps_script_name% %*
 
 exit /b %ERRORLEVEL%
 
