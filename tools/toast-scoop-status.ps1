@@ -16,16 +16,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-$status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
+$oldPriority = [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass
 
-if ($status) {
-    # Toast title.
-    $num_updatable_apps = $status.Count
-    $title = "Scoop: $num_updatable_apps app updates"
-    # Toast body.
-    $body = $status.Name -join ', '
-    # Invoke toast notification.
-    & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body
+try {
+    [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = 'Idle'
+
+    $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
+
+    if ($status) {
+        # Toast title.
+        $num_updatable_apps = $status.Count
+        $title = "Scoop: $num_updatable_apps app updates"
+        # Toast body.
+        $body = $status.Name -join ', '
+        # Invoke toast notification.
+        & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body
+    }
+}
+finally {
+    [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = $oldPriority
 }
 
 exit 0
