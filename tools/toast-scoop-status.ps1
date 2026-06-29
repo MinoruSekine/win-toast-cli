@@ -21,6 +21,14 @@ $oldPriority = [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass
 try {
     [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = 'Idle'
 
+    scoop update
+
+    if ($LASTEXITCODE -eq 0) {
+        $update_status_message = ""
+    } else {
+        $update_status_message = "Warning: `scoop status` is failed."
+    }
+
     $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
 
     if ($status) {
@@ -29,8 +37,21 @@ try {
         $title = "Scoop: $num_updatable_apps app updates"
         # Toast body.
         $body = $status.Name -join ', '
+        # Toast detail.
+        $detail = $update_status_message
+    } else {
+        $title = "Scoop: No updates available"
+        $body = $update_status_message
+        $detail = ""
+    }
+
+    if ($title -and $body) {
         # Invoke toast notification.
-        & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body
+        if ($detail) {
+            & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body -detail $detail
+        } else {
+            & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body
+        }
     }
 }
 finally {
