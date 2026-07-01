@@ -16,46 +16,68 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName = "Default")]
 param (
     [string]$body,
     [string]$title,
     [string]$detail,
+    [string]$link,
+    [string]$url,
     [switch]$version
 )
 
 $ToastCliVersion = '0.0.2'
 
 function Show-Toast {
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     param (
-        [Parameter(Mandatory = $false)][string]$title,
-        [Parameter(Mandatory = $false)][string]$message,
-        [Parameter(Mandatory = $false)][string]$detail
+        [Parameter(Mandatory = $false)]
+        [string]$title,
+        [Parameter(Mandatory = $false)]
+        [string]$body,
+        [Parameter(Mandatory = $false)]
+        [string]$detail,
+        [Parameter(Mandatory = $false)]
+        [string]$link,
+        [Parameter(Mandatory = $false)]
+        [string]$url
     )
+
+    # Check BurntToast availability.
+    if (-not (Get-Module -ListAvailable BurntToast)) {
+        throw @'
+Missing required module: BurntToast.
+Install it with `Install-Module -Name BurntToast -Scope CurrentUser`.
+'@
+    }
+
+    # Parameters check.
+    if (-not $body) {
+        throw [System.ArgumentException]@'
+Missing required argument: -Body. See -? for usage.
+'@
+    }
+    if ($link -xor $url) {
+        throw [System.ArgumentException]@'
+Both -link and -url are required for toast notification with link
+'@
+    }
 
     Import-Module BurntToast
 
-    New-BurntToastNotification -Text $title, $message, $detail
+    if ($link -and $url) {
+        $button = New-BTButton -Content $link -Arguments $url
+        New-BurntToastNotification `
+          -Text $title, $body, $detail -Button $button
+    } else {
+        New-BurntToastNotification -Text $title, $body, $detail
+    }
 }
-
 
 if ($version) {
     Write-Output "$($MyInvocation.MyCommand.Name) $ToastCliVersion"
 } else {
-    if ($body) {
-        if (-not (Get-Module -ListAvailable BurntToast)) {
-            Write-Error @'
-Missing required module: BurntToast.
-Install it with `Install-Module -Name BurntToast -Scope CurrentUser`.
-'@
-            exit 1
-        }
-
-        Show-Toast -title $title -message $body -detail $detail
-    } else {
-        Write-Error "Missing required argument: -Body. See -? for usage."
-        exit 1
-    }
+    Show-Toast @PSBoundParameters
 }
 
 exit 0
