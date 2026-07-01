@@ -46,11 +46,22 @@ try {
     }
 
     if ($title -and $body) {
+        # Compose link URL.
+        $thisPwshFullPath = `
+          Join-Path $PSHOME "$((Get-Process -Id $PID).ProcessName).exe"
+        $thisPwshFullPath = $thisPwshFullPath.Replace('\', '/')
+        $encodedPwshFullPath = [URI]::EscapeDataString($thisPwshFullPath)
+        $url = "file:///$encodedPwshFullPath"
+
         # Invoke toast notification.
         if ($detail) {
-            & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body -detail $detail
+            & "$PSScriptRoot\..\toast-cli.ps1" `
+              -title $title -body $body -detail $detail `
+              -link "Open PowerShell console" -url $url
         } else {
-            & "$PSScriptRoot\..\toast-cli.ps1" -title $title -body $body
+            & "$PSScriptRoot\..\toast-cli.ps1" `
+              -title $title -body $body `
+              -link "Open PowerShell console" -url $url
         }
     }
 }
