@@ -31,38 +31,30 @@ try {
 
     $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
 
-    if ($status) {
-        # Toast title.
-        $num_updatable_apps = $status.Count
-        $title = "Scoop: $num_updatable_apps app updates"
-        # Toast body.
-        $body = $status.Name -join ', '
-        # Toast detail.
-        $detail = $update_status_message
-    } else {
-        $title = "Scoop: No updates available"
-        $body = $update_status_message
-        $detail = ""
+    # Compose link URL.
+    $thisPwshFullPath = `
+      Join-Path $PSHOME "$((Get-Process -Id $PID).ProcessName).exe"
+    $thisPwshFullPath = $thisPwshFullPath.Replace('\', '/')
+    $encodedPwshFullPath = [URI]::EscapeDataString($thisPwshFullPath)
+
+    $toastParam = @{
+        Link = "Open PowerShell console"
+        Url  = "file:///$encodedPwshFullPath"
     }
 
-    if ($title -and $body) {
-        # Compose link URL.
-        $thisPwshFullPath = `
-          Join-Path $PSHOME "$((Get-Process -Id $PID).ProcessName).exe"
-        $thisPwshFullPath = $thisPwshFullPath.Replace('\', '/')
-        $encodedPwshFullPath = [URI]::EscapeDataString($thisPwshFullPath)
-        $url = "file:///$encodedPwshFullPath"
+    if ($status) {
+        $num_updatable_apps = $status.Count
+        $toastParam["Title"]  = "Scoop: $num_updatable_apps app updates"
+        $toastParam["Body"]   = $status.Name -join ', '
+        $toastParam["Detail"] = $update_status_message
+    } else {
+        $toastParam["Title"]  = "Scoop: No updates available"
+        $toastParam["Body"]   = $update_status_message
+    }
 
-        # Invoke toast notification.
-        if ($detail) {
-            & "$PSScriptRoot\..\toast-cli.ps1" `
-              -title $title -body $body -detail $detail `
-              -link "Open PowerShell console" -url $url
-        } else {
-            & "$PSScriptRoot\..\toast-cli.ps1" `
-              -title $title -body $body `
-              -link "Open PowerShell console" -url $url
-        }
+    # Show toast notification if app updates available or `scoop update` failed.
+    if ($status -or $update_status_message) {
+        & "$PSScriptRoot\..\toast-cli.ps1" @toastParam
     }
 }
 finally {
