@@ -27,6 +27,8 @@ On PowerShell console,
 - `-Body string`: String for toast notification body
 - `-Title string`: String for toast notification title (optional)
 - `-Detail string`: String for toast notification detail (optional)
+- `-Link string`: Link text for the toast button; must be used with `-Url`
+- `-Url string`: Target URL for the toast button; must be used with `-Link`
 - `-?`: Show help
 
 ## Contents
