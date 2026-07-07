@@ -24,9 +24,9 @@ On PowerShell console,
 
 ### Options
 
-- `-body string`: String for toast notification body
-- `-title string`: String for toast notification title (optional)
-- `-detail string`: String for toast notification detail (optional)
+- `-Body string`: String for toast notification body
+- `-Title string`: String for toast notification title (optional)
+- `-Detail string`: String for toast notification detail (optional)
 - `-?`: Show help
 
 ## Contents
