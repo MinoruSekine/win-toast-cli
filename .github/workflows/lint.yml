@@ -21,9 +21,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Reviewdog
-        uses: reviewdog/action-setup@v1.5.0
-
       - name: Run PSScriptAnalyzer
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
@@ -31,22 +28,15 @@ jobs:
           recurse: true
           output: PSScriptAnalyzer.sarif
 
-      - name: Convert SARIF URIs to relative
-        shell: pwsh
-        run: |
-          $cwd = (Get-Location).Path
-          $rootUri = (New-Object System.Uri($cwd)).AbsoluteUri.TrimEnd('/')
-          (Get-Content PSScriptAnalyzer.sarif -Raw) `
-            -replace [regex]::Escape("$rootUri/"), '' `
-            | Set-Content PSScriptAnalyzer.rel.sarif
+      - uses: astral-sh/setup-uv@v7.2.0
 
-      - name: Review by PSScriptAnalyzer outputs
-        shell: pwsh
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
+      - name: Add GitHub annotations by PSScriptAnalyzer.sarif
         run: |
-          Get-Content PSScriptAnalyzer.rel.sarif |
-            reviewdog -f=sarif -reporter=github-pr-review
+          uvx --from `
+          git+https://github.com/MinoruSekine/sarif2gha.git@abbea6e `
+          sarif2gha `
+          --project-root-dir="${{ github.workspace }}" PSScriptAnalyzer.sarif
+        shell: pwsh
 
   YAMLLint:
     runs-on: ubuntu-latest
