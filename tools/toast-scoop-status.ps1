@@ -24,9 +24,9 @@ try {
     scoop update
 
     if ($LASTEXITCODE -eq 0) {
-        $update_status_message = ""
+        $updateStatusMessage = ""
     } else {
-        $update_status_message = "Warning: `scoop update` is failed."
+        $updateStatusMessage = "Warning: `scoop update` is failed."
     }
 
     $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
@@ -43,17 +43,17 @@ try {
     }
 
     if ($status) {
-        $num_updatable_apps = $status.Count
-        $toastParam["Title"]  = "Scoop: $num_updatable_apps app updates"
+        $numUpdatableApps = $status.Count
+        $toastParam["Title"]  = "Scoop: $numUpdatableApps app updates"
         $toastParam["Body"]   = $status.Name -join ', '
-        $toastParam["Detail"] = $update_status_message
+        $toastParam["Detail"] = $updateStatusMessage
     } else {
         $toastParam["Title"]  = "Scoop: No updates available"
-        $toastParam["Body"]   = $update_status_message
+        $toastParam["Body"]   = $updateStatusMessage
     }
 
     # Show toast notification if app updates available or `scoop update` failed.
-    if ($status -or $update_status_message) {
+    if ($status -or $updateStatusMessage) {
         & "$PSScriptRoot\..\toast-cli.ps1" @toastParam
     }
 }
