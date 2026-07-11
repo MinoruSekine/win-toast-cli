@@ -26,7 +26,7 @@ try {
     if ($LASTEXITCODE -eq 0) {
         $update_status_message = ""
     } else {
-        $update_status_message = "Warning: `scoop status` is failed."
+        $update_status_message = "Warning: `scoop update` is failed."
     }
 
     $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
