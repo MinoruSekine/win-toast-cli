@@ -16,17 +16,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $False, HelpMessage = 'Process PriorityClass')]
+    [System.Diagnostics.ProcessPriorityClass]$PriorityClass = 'Idle',
+    [Parameter(Mandatory = $False, HelpMessage = 'Skip `scoop update`')]
+    [switch]$SkipScoopUpdate
+)
+
 $oldPriority = [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass
 
 try {
-    [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = 'Idle'
+    [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass = $PriorityClass
 
-    scoop update
-
-    if ($LASTEXITCODE -eq 0) {
-        $updateStatusMessage = ""
+    if (-not $SkipScoopUpdate) {
+        scoop update
+        if ($LASTEXITCODE -eq 0) {
+            $updateStatusMessage = ""
+        } else {
+            $updateStatusMessage = "Warning: `scoop update` is failed."
+        }
     } else {
-        $updateStatusMessage = "Warning: `scoop update` is failed."
+        $updateStatusMessage = ""
     }
 
     $status = @(scoop status 6>$null | Where-Object { $_.PSObject.Properties['Name'] })
