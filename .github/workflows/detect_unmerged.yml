@@ -1,0 +1,28 @@
+---
+
+name: Detect commits in the release branch which have not been merged to main.
+
+on:
+  push:
+    branches:
+      - main
+      - releng/v0
+  schedule:
+    - cron: 30 6 * * *
+  workflow_dispatch:
+
+jobs:
+  detect_unmerged:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out all branches
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect unmerged commit(s)
+        run: |
+          sh .github/workflows/scripts/detect_unmerged.sh \
+            origin/main origin/releng/v0
+        shell: bash
